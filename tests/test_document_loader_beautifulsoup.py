@@ -1,21 +1,43 @@
 import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import pytest
+from extract_thinker.document_loader.document_loader_beautiful_soup import DocumentLoaderBeautifulSoup
+from .test_document_loader_base import BaseDocumentLoaderTest
 
-from extract_thinker.document_loader.beautiful_soup_web_loader import DocumentLoaderBeautifulSoup
+class TestDocumentLoaderBeautifulSoup(BaseDocumentLoaderTest):
+    @pytest.fixture
+    def loader(self):
+        return DocumentLoaderBeautifulSoup(header_handling="summarize")
 
-def test_load_content_from_google():
-    # Arrange
-    loader = DocumentLoaderBeautifulSoup(header_handling="summarize")
-    url = "https://www.google.com"
-    
-    # Act
-    content = loader.load_content_from_file(url)
-    
-    # Assert
-    assert isinstance(content, dict)
-    assert "content" in content
-    assert "Google" in content["content"]
+    @pytest.fixture
+    def test_file_path(self):
+        return "https://www.google.com"  # Using a stable website for testing
 
-if __name__ == "__main__":
-    test_load_content_from_google()
+    def test_beautifulsoup_specific_content(self, loader, test_file_path):
+        """Test web content extraction"""
+        pages = loader.load(test_file_path)
+        
+        assert isinstance(pages, list)
+        assert len(pages) > 0
+        
+        first_page = pages[0]
+        assert "content" in first_page
+        assert "Google" in first_page["content"]
+
+    def test_header_handling(self, loader, test_file_path):
+        """Test header handling functionality"""
+        pages = loader.load(test_file_path)
+        first_page = pages[0]
+        assert "content" in first_page
+        # Headers should be processed according to the header_handling setting
+        assert isinstance(first_page["content"], str)
+
+    def test_invalid_url(self, loader):
+        """Test handling of invalid URLs"""
+        with pytest.raises(ValueError):
+            loader.load("https://this-is-an-invalid-url-that-should-not-exist.com")
+
+    def test_vision_mode(self, loader, test_file_path):
+        """Test that vision mode is not supported for BeautifulSoup loader"""
+        loader.set_vision_mode(True)
+        with pytest.raises(ValueError):
+            loader.load(test_file_path)

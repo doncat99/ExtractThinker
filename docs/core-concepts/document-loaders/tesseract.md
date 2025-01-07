@@ -2,57 +2,49 @@
 
 > Tesseract is an open-source OCR engine that can extract text from images and scanned PDFs. ExtractThinker's Tesseract Document Loader provides a simple interface to use Tesseract for document processing.
 
-## Prerequisite
+## Installation
 
-You need to have Tesseract installed on your system and set the path to the Tesseract executable:
+1. First, install Tesseract OCR on your system:
 
-```bash
-# On Ubuntu/Debian
-sudo apt-get install tesseract-ocr
+   **Ubuntu/Debian:**
+   ```bash
+   sudo apt-get install tesseract-ocr
+   ```
 
-# On macOS
-brew install tesseract
+   **macOS:**
+   ```bash
+   brew install tesseract
+   ```
 
-# On Windows
-# Download installer from https://github.com/UB-Mannheim/tesseract/wiki
-```
+   **Windows:**
+   Download and install from [GitHub Tesseract releases](https://github.com/UB-Mannheim/tesseract/wiki)
 
-```python
-%pip install --upgrade --quiet extract_thinker pytesseract Pillow
-```
+2. Install the Python package:
+   ```bash
+   pip install pytesseract Pillow
+   ```
 
 ## Basic Usage
 
 Here's a simple example of using the Tesseract Document Loader:
 
 ```python
-from extract_thinker import Extractor
-from extract_thinker.document_loader import DocumentLoaderTesseract
+from extract_thinker import DocumentLoaderTesseract
 
 # Initialize the loader with Tesseract path
 tesseract_path = os.getenv("TESSERACT_PATH")
 loader = DocumentLoaderTesseract(tesseract_path)
 
-# Load document
-content = loader.load("invoice.png")
+# Load from file
+pages = loader.load("path/to/your/image.png")
 
-# Get content list (page by page)
-content_list = loader.load_content_list("invoice.png")
+# Process the extracted text
+for page in pages:
+    text = page["content"]
+    print(f"Extracted text: {text}")
 ```
 
-## Advanced Configuration
-
-You can customize the Tesseract configuration:
-
-```python
-loader = DocumentLoaderTesseract(
-    tesseract_path,
-    lang='eng',  # Language code
-    config='--psm 1'  # Page segmentation mode
-)
-```
-
-Document Intelligence supports `PDF`, `JPEG/JPG`, `PNG`, `BMP`, `TIFF`
+Supports `PDF`, `JPEG/JPG`, `PNG`, `BMP`, `TIFF`
 
 ## Best Practices
 
@@ -61,4 +53,4 @@ Document Intelligence supports `PDF`, `JPEG/JPG`, `PNG`, `BMP`, `TIFF`
 - Consider image preprocessing for better accuracy
 - Set appropriate page segmentation mode based on document layout
 
-For more examples and advanced usage, check out the [Local Stack](../../examples/local-processing) in the repository.
+For more examples and advanced usage, check out the [Local Stack](../../../examples/local-processing) in the repository.
